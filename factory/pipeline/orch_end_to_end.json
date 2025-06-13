@@ -1,0 +1,105 @@
+{
+	"name": "orch_end_to_end",
+	"properties": {
+		"activities": [
+			{
+				"name": "C2P",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "S2C",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "C2P",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "S2C",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "S2C",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "P2sink",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "C2P",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "P2S",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "email_notifications",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "P2sink",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"url": "https://prod-08.northcentralus.logic.azure.com:443/workflows/daacc25eab0749a2926a5911707266df/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=dtrbUwDenJz54sU6l2i2Gnk84GPL6Gg3-EtWmj9ZWWk",
+					"body": {
+						"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"pipelineRunId\": \"@{pipeline().RunId}\",\n  \"time\": \"@{utcNow()}\",\n  \"Status\": \"@{activity('P2sink').Status}\"\n}\n",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"status": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-06-13T04:14:54Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,234 @@
+{
+	"name": "C2P",
+	"properties": {
+		"activities": [
+			{
+				"name": "end_time",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "ForEach1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
+					"baseParameters": {
+						"pipeline_name": {
+							"value": "@pipeline().Pipeline",
+							"type": "Expression"
+						},
+						"pipeline_run_id": {
+							"value": "@pipeline().RunId",
+							"type": "Expression"
+						},
+						"mode": "end_time"
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "notebook_linked_service",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "end_time_status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "end_time",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "status",
+					"value": {
+						"value": "@if(equals(activity('end_time').status, 'Succeeded'), 'Success', 'Failure')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "status_update",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "end_time_status",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
+					"baseParameters": {
+						"pipeline_name": {
+							"value": "@pipeline().Pipeline",
+							"type": "Expression"
+						},
+						"pipeline_run_id": {
+							"value": "@pipeline().RunId",
+							"type": "Expression"
+						},
+						"mode": "end_time",
+						"status": {
+							"value": "@variables('status')",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "notebook_linked_service",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Metadata",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "SELECT tm.*\nFROM meta_data.table_meta tm\nJOIN meta_data.Job_data  jm ON tm.JobID = jm.JobID WHERE  jm.jobname = 'C2P'   and table_type='fact';",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "metadata_info",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Metadata').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "start_time",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
+								"baseParameters": {
+									"pipeline_name": {
+										"value": "@pipeline().Pipeline",
+										"type": "Expression"
+									},
+									"pipeline_run_id": {
+										"value": "@pipeline().RunId",
+										"type": "Expression"
+									},
+									"mode": "start_time"
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "notebook_linked_service",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "process_layer",
+							"type": "DatabricksNotebook",
+							"dependsOn": [
+								{
+									"activity": "start_time",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Users/21691a3230@mits.ac.in/Transformation_logic",
+								"baseParameters": {
+									"process_path": {
+										"value": "@item().processed_Path",
+										"type": "Expression"
+									},
+									"Mode": {
+										"value": "@item().Mode",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "notebook_linked_service",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"status": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-06-12T05:19:16Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

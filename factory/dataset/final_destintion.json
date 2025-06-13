@@ -1,0 +1,111 @@
+{
+	"name": "final_destintion",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SqlServer1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "MATERIAL_DOC_NO",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "MATERIAL_DOC_YEAR",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "MATERIAL_DOC_ITEM",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "MOVEMENT_TYPE",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "MATERIAL_NO",
+				"type": "varchar"
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "varchar"
+			},
+			{
+				"name": "QUANTITY",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "UNIT_OF_ENTRY",
+				"type": "varchar"
+			},
+			{
+				"name": "AMOUNT_IN_LC",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SENDER_STORAGE_LOCATION",
+				"type": "varchar"
+			},
+			{
+				"name": "SENDER_PLANT",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "RECEIVING_STORAGE_LOCATION",
+				"type": "varchar"
+			},
+			{
+				"name": "RECEIVING_PLANT",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "POSTING_DATE",
+				"type": "date"
+			},
+			{
+				"name": "ENTRY_DATE",
+				"type": "date"
+			},
+			{
+				"name": "ENTRY_TIME",
+				"type": "varchar"
+			},
+			{
+				"name": "USERNAME",
+				"type": "varchar"
+			},
+			{
+				"name": "CUSTOMER_ID",
+				"type": "varchar"
+			},
+			{
+				"name": "SALES_ORDER_NO",
+				"type": "varchar"
+			},
+			{
+				"name": "SALES_ORDER_ITEM",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "FUNDS_CENTER",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "semantic",
+			"table": "fact_quality_material_movement"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
