@@ -1,0 +1,39 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "datafactorytaskk"
+		},
+		"SqlServer1_password": {
+			"value": ""
+		},
+		"notebook_linked_service_accessToken": {
+			"value": ""
+		},
+		"source_data_accountKey": {
+			"value": ""
+		},
+		"SqlServer1_properties_typeProperties_server": {
+			"value": "ssmssevers.database.windows.net"
+		},
+		"SqlServer1_properties_typeProperties_database": {
+			"value": "dataa"
+		},
+		"SqlServer1_properties_typeProperties_userName": {
+			"value": "Haripriya"
+		},
+		"notebook_linked_service_properties_typeProperties_existingClusterId": {
+			"value": "0604-064721-b656qwbt"
+		},
+		"source_data_properties_typeProperties_url": {
+			"value": "https://streastusdata.dfs.core.windows.net/"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
