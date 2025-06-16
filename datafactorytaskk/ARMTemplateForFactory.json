@@ -51,110 +51,6 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "end_time",
-						"type": "DatabricksNotebook",
-						"dependsOn": [
-							{
-								"activity": "ForEach1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
-							"baseParameters": {
-								"pipeline_name": {
-									"value": "@pipeline().Pipeline",
-									"type": "Expression"
-								},
-								"pipeline_run_id": {
-									"value": "@pipeline().RunId",
-									"type": "Expression"
-								},
-								"mode": "end_time"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "notebook_linked_service",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "end_time_status",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "end_time",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "status",
-							"value": {
-								"value": "@if(equals(activity('end_time').status, 'Succeeded'), 'Success', 'Failure')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "status_update",
-						"type": "DatabricksNotebook",
-						"dependsOn": [
-							{
-								"activity": "end_time_status",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
-							"baseParameters": {
-								"pipeline_name": {
-									"value": "@pipeline().Pipeline",
-									"type": "Expression"
-								},
-								"pipeline_run_id": {
-									"value": "@pipeline().RunId",
-									"type": "Expression"
-								},
-								"mode": "end_time",
-								"status": {
-									"value": "@variables('status')",
-									"type": "Expression"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "notebook_linked_service",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
 						"name": "Metadata",
 						"type": "Lookup",
 						"dependsOn": [],
@@ -218,11 +114,15 @@
 												"value": "@pipeline().Pipeline",
 												"type": "Expression"
 											},
-											"pipeline_run_id": {
-												"value": "@pipeline().RunId",
+											"process_mode": "start_time",
+											"jobID": {
+												"value": "@string(item().jobID)",
 												"type": "Expression"
 											},
-											"mode": "start_time"
+											"File_Names": {
+												"value": "@item().Table_Names",
+												"type": "Expression"
+											}
 										}
 									},
 									"linkedServiceName": {
@@ -266,6 +166,52 @@
 										"referenceName": "notebook_linked_service",
 										"type": "LinkedServiceReference"
 									}
+								},
+								{
+									"name": "end_time_on_sucess",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "process_layer",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
+										"baseParameters": {
+											"pipeline_name": {
+												"value": "@pipeline().Pipeline",
+												"type": "Expression"
+											},
+											"process_mode": "end_time",
+											"status": {
+												"value": "@{activity('process_layer').Status}",
+												"type": "Expression"
+											},
+											"jobID": {
+												"value": "@string(item().jobID)",
+												"type": "Expression"
+											},
+											"File_Names": {
+												"value": "@item().Table_Names",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "notebook_linked_service",
+										"type": "LinkedServiceReference"
+									}
 								}
 							]
 						}
@@ -283,8 +229,8 @@
 				"lastPublishTime": "2025-06-12T05:19:16Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/notebook_linked_service')]",
-				"[concat(variables('factoryId'), '/datasets/metadata_info')]"
+				"[concat(variables('factoryId'), '/datasets/metadata_info')]",
+				"[concat(variables('factoryId'), '/linkedServices/notebook_linked_service')]"
 			]
 		},
 		{
@@ -444,7 +390,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlServerSource",
-								"sqlReaderQuery": "SELECT tm.*\nFROM meta_data.table_meta tm\nJOIN meta_data.Job_data  jm ON tm.JobID = jm.JobID\nWHERE tm.Table_Names IN ('MKPF', 'MSEG')\nAND jm.jobname = 'S2C';",
+								"sqlReaderQuery": "SELECT tm.*\nFROM meta_data.table_meta tm\nJOIN meta_data.Job_data  jm ON tm.JobID = jm.JobID\n\nAND jm.jobname = 'S2C';",
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -585,11 +531,15 @@
 												"value": "@pipeline().Pipeline",
 												"type": "Expression"
 											},
-											"pipeline_run_id": {
-												"value": "@pipeline().RunId",
+											"process_mode": "start_time",
+											"File_Names": {
+												"value": "@item().Table_Names",
 												"type": "Expression"
 											},
-											"process_mode": "start_time"
+											"jobID": {
+												"value": "@string(item().jobID)",
+												"type": "Expression"
+											}
 										}
 									},
 									"linkedServiceName": {
@@ -718,112 +668,100 @@
 										"referenceName": "notebook_linked_service",
 										"type": "LinkedServiceReference"
 									}
+								},
+								{
+									"name": "end_time_on_sucess",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "archieve",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
+										"baseParameters": {
+											"pipeline_name": {
+												"value": "@pipeline().Pipeline",
+												"type": "Expression"
+											},
+											"process_mode": "end_time",
+											"status": {
+												"value": "@{activity('archieve').Status}",
+												"type": "Expression"
+											},
+											"jobID": {
+												"value": "@string(item().jobID)",
+												"type": "Expression"
+											},
+											"File_Names": {
+												"value": "@item().Table_Names",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "notebook_linked_service",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "end_time_on_sucess_copy",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "archieve_on_fail",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
+										"baseParameters": {
+											"pipeline_name": {
+												"value": "@pipeline().Pipeline",
+												"type": "Expression"
+											},
+											"process_mode": "end_time",
+											"status": {
+												"value": "@{activity('archieve_on_fail').Status}",
+												"type": "Expression"
+											},
+											"jobID": {
+												"value": "@string(item().jobID)",
+												"type": "Expression"
+											},
+											"File_Names": {
+												"value": "@item().Table_Names",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "notebook_linked_service",
+										"type": "LinkedServiceReference"
+									}
 								}
 							]
-						}
-					},
-					{
-						"name": "end_time",
-						"type": "DatabricksNotebook",
-						"dependsOn": [
-							{
-								"activity": "ETL_process",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
-							"baseParameters": {
-								"pipeline_name": {
-									"value": "@pipeline().Pipeline",
-									"type": "Expression"
-								},
-								"pipeline_run_id": {
-									"value": "@pipeline().RunId",
-									"type": "Expression"
-								},
-								"process_mode": "end_time"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "notebook_linked_service",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "end_time_status",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "end_time",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "status",
-							"value": {
-								"value": "@if(equals(activity('end_time').status, 'Succeeded'), 'Success', 'Failure')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "status_update",
-						"type": "DatabricksNotebook",
-						"dependsOn": [
-							{
-								"activity": "end_time_status",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
-							"baseParameters": {
-								"pipeline_name": {
-									"value": "@pipeline().Pipeline",
-									"type": "Expression"
-								},
-								"pipeline_run_id": {
-									"value": "@pipeline().RunId",
-									"type": "Expression"
-								},
-								"process_mode": "end_time",
-								"status": {
-									"value": "@variables('status')",
-									"type": "Expression"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "notebook_linked_service",
-							"type": "LinkedServiceReference"
 						}
 					}
 				],
@@ -840,9 +778,9 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/metadata_info')]",
-				"[concat(variables('factoryId'), '/linkedServices/notebook_linked_service')]",
 				"[concat(variables('factoryId'), '/datasets/source_data')]",
-				"[concat(variables('factoryId'), '/datasets/destination')]"
+				"[concat(variables('factoryId'), '/datasets/destination')]",
+				"[concat(variables('factoryId'), '/linkedServices/notebook_linked_service')]"
 			]
 		},
 		{
