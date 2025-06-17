@@ -768,11 +768,7 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"variables": {
-					"status": {
-						"type": "String"
-					}
-				},
+				"parameters": {},
 				"annotations": [],
 				"lastPublishTime": "2025-06-12T12:04:25Z"
 			},
