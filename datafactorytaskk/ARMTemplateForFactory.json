@@ -878,7 +878,7 @@
 							"headers": {},
 							"url": "https://prod-08.northcentralus.logic.azure.com:443/workflows/daacc25eab0749a2926a5911707266df/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=dtrbUwDenJz54sU6l2i2Gnk84GPL6Gg3-EtWmj9ZWWk",
 							"body": {
-								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"pipelineRunId\": \"@{pipeline().RunId}\",\n  \"time\": \"@{utcNow()}\",\n  \"Status\": \"@{activity('P2sink').Status}\",\n  \"ActivityName\": \"@{activity('P2sink').name}\"\n}\n",
+								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"pipelineRunId\": \"@{pipeline().RunId}\",\n  \"time\": \"@{utcNow()}\",\n  \"Status\": \"@{activity('P2sink').Status}\",\n  \"ActivityName\": \"P2sink\"\n}\n",
 								"type": "Expression"
 							}
 						}
@@ -907,7 +907,7 @@
 							"headers": {},
 							"url": "https://prod-08.northcentralus.logic.azure.com:443/workflows/daacc25eab0749a2926a5911707266df/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=dtrbUwDenJz54sU6l2i2Gnk84GPL6Gg3-EtWmj9ZWWk",
 							"body": {
-								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"pipelineRunId\": \"@{pipeline().RunId}\",\n  \"time\": \"@{utcNow()}\",\n  \"Status\": \"@{activity('S2C').Status}\",\n  \"ActivityName\": \"@{activity('S2C').name}\"\n}\n\n",
+								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"pipelineRunId\": \"@{pipeline().RunId}\",\n  \"time\": \"@{utcNow()}\",\n  \"Status\": \"@{activity('S2C').Status}\",\n  \"ActivityName\": \"S2C\"\n}\n\n",
 								"type": "Expression"
 							}
 						}
@@ -936,7 +936,7 @@
 							"headers": {},
 							"url": "https://prod-08.northcentralus.logic.azure.com:443/workflows/daacc25eab0749a2926a5911707266df/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=dtrbUwDenJz54sU6l2i2Gnk84GPL6Gg3-EtWmj9ZWWk",
 							"body": {
-								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"pipelineRunId\": \"@{pipeline().RunId}\",\n  \"time\": \"@{utcNow()}\",\n  \"Status\": \"@{activity('C2P').Status}\",\n  \"ActivityName\": \"@{activity('C2P').name}\"\n}\n",
+								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"pipelineRunId\": \"@{pipeline().RunId}\",\n  \"time\": \"@{utcNow()}\",\n  \"Status\": \"@{activity('C2P').Status}\",\n  \"ActivityName\": \"C2P\"\n}\n",
 								"type": "Expression"
 							}
 						}
