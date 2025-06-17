@@ -158,7 +158,10 @@
 										"type": "Expression"
 									},
 									"process_mode": "start_time",
-									"File_Names": "@item().Table_Names",
+									"File_Names": {
+										"value": "@item().Table_Names",
+										"type": "Expression"
+									},
 									"jobID": {
 										"value": "@string(item().jobID)",
 										"type": "Expression"
@@ -388,11 +391,6 @@
 				}
 			}
 		],
-		"variables": {
-			"status": {
-				"type": "String"
-			}
-		},
 		"annotations": [],
 		"lastPublishTime": "2025-06-12T12:04:25Z"
 	},
