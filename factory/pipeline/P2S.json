@@ -49,7 +49,14 @@
 						{
 							"name": "P2S",
 							"type": "Copy",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "start_time",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"policy": {
 								"timeout": "0.12:00:00",
 								"retry": 0,
@@ -108,6 +115,87 @@
 									"type": "DatasetReference"
 								}
 							]
+						},
+						{
+							"name": "start_time",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
+								"baseParameters": {
+									"pipeline_name": {
+										"value": "@pipeline().Pipeline",
+										"type": "Expression"
+									},
+									"File_Names": {
+										"value": "@item().Table_Names",
+										"type": "Expression"
+									},
+									"jobID": {
+										"value": "@string(item().jobID)",
+										"type": "Expression"
+									},
+									"process_mode": "start_time"
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "notebook_linked_service",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "end_time_on_sucess",
+							"type": "DatabricksNotebook",
+							"dependsOn": [
+								{
+									"activity": "P2S",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
+								"baseParameters": {
+									"pipeline_name": {
+										"value": "@pipeline().Pipeline",
+										"type": "Expression"
+									},
+									"process_mode": "end_time",
+									"status": {
+										"value": "@{activity('process_layer').Status}",
+										"type": "Expression"
+									},
+									"jobID": {
+										"value": "@string(item().jobID)",
+										"type": "Expression"
+									},
+									"File_Names": {
+										"value": "@item().Table_Names",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "notebook_linked_service",
+								"type": "LinkedServiceReference"
+							}
 						}
 					]
 				}

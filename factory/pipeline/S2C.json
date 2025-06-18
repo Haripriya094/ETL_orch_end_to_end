@@ -29,7 +29,7 @@
 				}
 			},
 			{
-				"name": "ETL_process",
+				"name": "S_2_C_process",
 				"type": "ForEach",
 				"dependsOn": [
 					{
