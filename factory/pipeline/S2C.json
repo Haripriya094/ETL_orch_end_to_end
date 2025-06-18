@@ -157,7 +157,6 @@
 										"value": "@pipeline().Pipeline",
 										"type": "Expression"
 									},
-									"process_mode": "start_time",
 									"File_Names": {
 										"value": "@item().Table_Names",
 										"type": "Expression"
@@ -165,7 +164,8 @@
 									"jobID": {
 										"value": "@string(item().jobID)",
 										"type": "Expression"
-									}
+									},
+									"process_mode": "start_time"
 								}
 							},
 							"linkedServiceName": {
