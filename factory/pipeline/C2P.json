@@ -29,7 +29,7 @@
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "C_2_P_files_load",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -66,8 +66,14 @@
 										"type": "Expression"
 									},
 									"process_mode": "start_time",
-									"jobID": "@string(item().jobID)",
-									"File_Names": "@item().Table_Names"
+									"jobID": {
+										"value": "@string(item().jobID)",
+										"type": "Expression"
+									},
+									"File_Names": {
+										"value": "@item().Table_Names",
+										"type": "Expression"
+									}
 								}
 							},
 							"linkedServiceName": {
@@ -113,7 +119,7 @@
 							}
 						},
 						{
-							"name": "end_time_on_sucess",
+							"name": "end_time",
 							"type": "DatabricksNotebook",
 							"dependsOn": [
 								{

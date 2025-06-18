@@ -29,7 +29,7 @@
 				}
 			},
 			{
-				"name": "S_2_C_process",
+				"name": "S_2_C_files_load",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -296,7 +296,7 @@
 							}
 						},
 						{
-							"name": "end_time_on_sucess",
+							"name": "end_time",
 							"type": "DatabricksNotebook",
 							"dependsOn": [
 								{
@@ -342,7 +342,7 @@
 							}
 						},
 						{
-							"name": "end_time_on_sucess_copy",
+							"name": "end_time_on_archieve_fail",
 							"type": "DatabricksNotebook",
 							"dependsOn": [
 								{
