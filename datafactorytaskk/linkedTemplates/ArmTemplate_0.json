@@ -398,7 +398,7 @@
 						}
 					},
 					{
-						"name": "ForEach1",
+						"name": "C_2_P_files_load",
 						"type": "ForEach",
 						"dependsOn": [
 							{
@@ -488,7 +488,7 @@
 									}
 								},
 								{
-									"name": "end_time_on_sucess",
+									"name": "end_time",
 									"type": "DatabricksNotebook",
 									"dependsOn": [
 										{
@@ -711,7 +711,7 @@
 									}
 								},
 								{
-									"name": "end_time_on_sucess",
+									"name": "end_time",
 									"type": "DatabricksNotebook",
 									"dependsOn": [
 										{
@@ -738,7 +738,7 @@
 											},
 											"process_mode": "end_time",
 											"status": {
-												"value": "@{activity('process_layer').Status}",
+												"value": "@{activity('P2S').Status}",
 												"type": "Expression"
 											},
 											"jobID": {
@@ -812,7 +812,7 @@
 						}
 					},
 					{
-						"name": "S_2_C_process",
+						"name": "S_2_C_files_load",
 						"type": "ForEach",
 						"dependsOn": [
 							{
@@ -1079,7 +1079,7 @@
 									}
 								},
 								{
-									"name": "end_time_on_sucess",
+									"name": "end_time",
 									"type": "DatabricksNotebook",
 									"dependsOn": [
 										{
@@ -1125,7 +1125,7 @@
 									}
 								},
 								{
-									"name": "end_time_on_sucess_copy",
+									"name": "end_time_on_archieve_fail",
 									"type": "DatabricksNotebook",
 									"dependsOn": [
 										{
