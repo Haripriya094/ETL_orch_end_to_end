@@ -607,7 +607,14 @@
 								{
 									"name": "P2S",
 									"type": "Copy",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "start_time",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -667,6 +674,87 @@
 											"parameters": {}
 										}
 									]
+								},
+								{
+									"name": "start_time",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
+										"baseParameters": {
+											"pipeline_name": {
+												"value": "@pipeline().Pipeline",
+												"type": "Expression"
+											},
+											"File_Names": {
+												"value": "@item().Table_Names",
+												"type": "Expression"
+											},
+											"jobID": {
+												"value": "@string(item().jobID)",
+												"type": "Expression"
+											},
+											"process_mode": "start_time"
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "notebook_linked_service",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "end_time_on_sucess",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "P2S",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
+										"baseParameters": {
+											"pipeline_name": {
+												"value": "@pipeline().Pipeline",
+												"type": "Expression"
+											},
+											"process_mode": "end_time",
+											"status": {
+												"value": "@{activity('process_layer').Status}",
+												"type": "Expression"
+											},
+											"jobID": {
+												"value": "@string(item().jobID)",
+												"type": "Expression"
+											},
+											"File_Names": {
+												"value": "@item().Table_Names",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "notebook_linked_service",
+										"type": "LinkedServiceReference"
+									}
 								}
 							]
 						}
@@ -686,7 +774,8 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/metadata_info')]",
 				"[concat(variables('factoryId'), '/datasets/P2S_source')]",
-				"[concat(variables('factoryId'), '/datasets/final_destintion')]"
+				"[concat(variables('factoryId'), '/datasets/final_destintion')]",
+				"[concat(variables('factoryId'), '/linkedServices/notebook_linked_service')]"
 			]
 		},
 		{
@@ -723,7 +812,7 @@
 						}
 					},
 					{
-						"name": "ETL_process",
+						"name": "S_2_C_process",
 						"type": "ForEach",
 						"dependsOn": [
 							{
@@ -1193,7 +1282,7 @@
 							"headers": {},
 							"url": "https://prod-08.northcentralus.logic.azure.com:443/workflows/daacc25eab0749a2926a5911707266df/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=dtrbUwDenJz54sU6l2i2Gnk84GPL6Gg3-EtWmj9ZWWk",
 							"body": {
-								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"Status\": \"@{activity('P2sink').Status}\",\n  \"ActivityName\": \"@{activity('P2sink').output.pipelineName}\",\n  \"errorMessage\": \"@{activity('P2sink').error.message}\" \n}\n",
+								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"Status\": \"@{activity('P2sink').Status}\",\n  \"ActivityName\": \"@{activity('P2sink').output.pipelineName}\",\n  \"errorMessage\": \"@{if(equals(activity('P2sink').Status,'Failed'), activity('P2sink').Error.message, '')}\"\n}\n",
 								"type": "Expression"
 							}
 						}
@@ -1222,7 +1311,7 @@
 							"headers": {},
 							"url": "https://prod-08.northcentralus.logic.azure.com:443/workflows/daacc25eab0749a2926a5911707266df/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=dtrbUwDenJz54sU6l2i2Gnk84GPL6Gg3-EtWmj9ZWWk",
 							"body": {
-								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"Status\": \"@{activity('S2C').Status}\",\n  \"ActivityName\": \"@{activity('S2C').output.pipelineName}\",\n  \"errorMessage\": \"@{activity('S2C').error.message}\"\n}\n\n",
+								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"Status\": \"@{activity('S2C').Status}\",\n  \"ActivityName\": \"@{activity('S2C').output.pipelineName}\",\n  \"errorMessage\": \"@{if(equals(activity('S2C').Status,'Failed'), activity('S2C').Error.message, '')}\"\n}\n",
 								"type": "Expression"
 							}
 						}
@@ -1251,7 +1340,7 @@
 							"headers": {},
 							"url": "https://prod-08.northcentralus.logic.azure.com:443/workflows/daacc25eab0749a2926a5911707266df/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=dtrbUwDenJz54sU6l2i2Gnk84GPL6Gg3-EtWmj9ZWWk",
 							"body": {
-								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"Status\": \"@{activity('C2P').Status}\",\n  \"ActivityName\": \"@{activity('C2P').output.pipelineName}\",\n  \"errorMessage\": \"@{activity('C2P').error.message}\"\n}\n",
+								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"Status\": \"@{activity('C2P').Status}\",\n  \"ActivityName\": \"@{activity('C2P').output.pipelineName}\",\n  \"errorMessage\": \"@{if(equals(activity('C2P').Status,'Failed'), activity('C2P').Error.message, '')}\"\n}\n",
 								"type": "Expression"
 							}
 						}
