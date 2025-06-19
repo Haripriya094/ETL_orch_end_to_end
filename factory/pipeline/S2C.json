@@ -333,6 +333,10 @@
 									"File_Names": {
 										"value": "@item().Table_Names",
 										"type": "Expression"
+									},
+									"start_time": {
+										"value": "@activity('start_time').output.runOutput.st_res",
+										"type": "Expression"
 									}
 								}
 							},
@@ -379,7 +383,8 @@
 									"File_Names": {
 										"value": "@item().Table_Names",
 										"type": "Expression"
-									}
+									},
+									"start_time": "@activity('start_time').output.runOutput.st_res"
 								}
 							},
 							"linkedServiceName": {
