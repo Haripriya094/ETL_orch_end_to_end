@@ -729,44 +729,6 @@
 									}
 								},
 								{
-									"name": "archieve_on_fail",
-									"type": "DatabricksNotebook",
-									"dependsOn": [
-										{
-											"activity": "bronze_sliver",
-											"dependencyConditions": [
-												"Failed"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
-										"baseParameters": {
-											"File_Names": {
-												"value": "@item().File_Names",
-												"type": "Expression"
-											},
-											"landing_path": {
-												"value": "@item().landing_Path",
-												"type": "Expression"
-											},
-											"mode": "ARC_path"
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "notebook_linked_service",
-										"type": "LinkedServiceReference"
-									}
-								},
-								{
 									"name": "end_time",
 									"type": "DatabricksNotebook",
 									"dependsOn": [
@@ -817,13 +779,13 @@
 									}
 								},
 								{
-									"name": "end_time_on_archieve_fail",
+									"name": "archieve_on_fail",
 									"type": "DatabricksNotebook",
 									"dependsOn": [
 										{
-											"activity": "archieve_on_fail",
+											"activity": "source_bronze",
 											"dependencyConditions": [
-												"Completed"
+												"Failed"
 											]
 										}
 									],
@@ -838,27 +800,15 @@
 									"typeProperties": {
 										"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
 										"baseParameters": {
-											"pipeline_name": {
-												"value": "@pipeline().Pipeline",
-												"type": "Expression"
-											},
-											"process_mode": "end_time",
-											"status": {
-												"value": "@{activity('archieve_on_fail').Status}",
-												"type": "Expression"
-											},
-											"jobID": {
-												"value": "@string(item().jobID)",
-												"type": "Expression"
-											},
 											"File_Names": {
-												"value": "@item().Table_Names",
+												"value": "@item().File_Names",
 												"type": "Expression"
 											},
-											"start_time": {
-												"value": "@activity('start_time').output.runOutput.st_res",
+											"landing_path": {
+												"value": "@item().landing_Path",
 												"type": "Expression"
-											}
+											},
+											"mode": "ARC_path"
 										}
 									},
 									"linkedServiceName": {
@@ -1378,44 +1328,6 @@
 				}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/start_pipeline_time')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "orch_end_to_end",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Day",
-						"interval": 1,
-						"startTime": "2025-06-12T12:06:00",
-						"timeZone": "India Standard Time",
-						"schedule": {
-							"minutes": [
-								0
-							],
-							"hours": [
-								10
-							]
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/orch_end_to_end')]"
-			]
 		}
 	]
 }
