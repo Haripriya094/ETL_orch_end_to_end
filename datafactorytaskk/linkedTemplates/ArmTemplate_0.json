@@ -527,7 +527,7 @@
 												"type": "Expression"
 											},
 											"start_time": {
-												"value": "@activity('start_time').output.runOutput.st_res",
+												"value": "@activity('start_time').output.runOutput.start_time",
 												"type": "Expression"
 											}
 										}
@@ -754,7 +754,7 @@
 												"type": "Expression"
 											},
 											"start_time": {
-												"value": "@activity('start_time').output.runOutput.st_res",
+												"value": "@activity('start_time').output.runOutput.start_time",
 												"type": "Expression"
 											}
 										}
@@ -1088,7 +1088,7 @@
 												"type": "Expression"
 											},
 											"start_time": {
-												"value": "@activity('start_time').output.runOutput.st_res",
+												"value": "@activity('start_time').output.runOutput.start_time",
 												"type": "Expression"
 											}
 										}
@@ -1129,6 +1129,56 @@
 												"type": "Expression"
 											},
 											"mode": "ARC_path"
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "notebook_linked_service",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "end_time_on_fail",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "archieve_on_fail",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
+										"baseParameters": {
+											"pipeline_name": {
+												"value": "@pipeline().Pipeline",
+												"type": "Expression"
+											},
+											"process_mode": "end_time",
+											"status": {
+												"value": "@{activity('source_bronze').Status}",
+												"type": "Expression"
+											},
+											"jobID": {
+												"value": "@string(item().jobID)",
+												"type": "Expression"
+											},
+											"File_Names": {
+												"value": "@item().Table_Names",
+												"type": "Expression"
+											},
+											"start_time": {
+												"value": "@activity('start_time').output.runOutput.start_time",
+												"type": "Expression"
+											}
 										}
 									},
 									"linkedServiceName": {
@@ -1248,7 +1298,7 @@
 							"headers": {},
 							"url": "https://prod-08.northcentralus.logic.azure.com:443/workflows/daacc25eab0749a2926a5911707266df/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=dtrbUwDenJz54sU6l2i2Gnk84GPL6Gg3-EtWmj9ZWWk",
 							"body": {
-								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"Status\": \"@{activity('P2sink').Status}\",\n  \"ActivityName\": \"@{activity('P2sink').output.pipelineName}\",\n  \"errorMessage\": \"@{if(equals(activity('P2sink').Status,'Failed'), activity('P2sink').Error.message, '')}\"\n}\n",
+								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"pipelinerunid\":\"@{pipeline().RunId}\",\n  \"Status\": \"@{activity('P2sink').Status}\",\n  \"ActivityName\": \"@{activity('P2sink').output.pipelineName}\",\n  \"errorMessage\": \"@{if(equals(activity('P2sink').Status,'Failed'), activity('P2sink').Error.message, '')}\"\n}\n",
 								"type": "Expression"
 							}
 						}
@@ -1277,7 +1327,7 @@
 							"headers": {},
 							"url": "https://prod-08.northcentralus.logic.azure.com:443/workflows/daacc25eab0749a2926a5911707266df/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=dtrbUwDenJz54sU6l2i2Gnk84GPL6Gg3-EtWmj9ZWWk",
 							"body": {
-								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"Status\": \"@{activity('S2C').Status}\",\n  \"ActivityName\": \"@{activity('S2C').output.pipelineName}\",\n  \"errorMessage\": \"@{if(equals(activity('S2C').Status,'Failed'), activity('S2C').Error.message, '')}\"\n}\n",
+								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"pipelinerunid\":\"@{pipeline().RunId}\",\n  \"Status\": \"@{activity('S2C').Status}\",\n  \"ActivityName\": \"@{activity('S2C').output.pipelineName}\",\n  \"errorMessage\": \"@{if(equals(activity('S2C').Status,'Failed'), activity('S2C').Error.message, '')}\"\n}\n",
 								"type": "Expression"
 							}
 						}
@@ -1306,7 +1356,7 @@
 							"headers": {},
 							"url": "https://prod-08.northcentralus.logic.azure.com:443/workflows/daacc25eab0749a2926a5911707266df/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=dtrbUwDenJz54sU6l2i2Gnk84GPL6Gg3-EtWmj9ZWWk",
 							"body": {
-								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"Status\": \"@{activity('C2P').Status}\",\n  \"ActivityName\": \"@{activity('C2P').output.pipelineName}\",\n  \"errorMessage\": \"@{if(equals(activity('C2P').Status,'Failed'), activity('C2P').Error.message, '')}\"\n}\n",
+								"value": "{\n  \"dataFactoryName\": \"@{pipeline().DataFactory}\",\n  \"pipelineName\": \"@{pipeline().Pipeline}\",\n  \"pipelinerunid\":\"@{pipeline().RunId}\",\n  \"Status\": \"@{activity('C2P').Status}\",\n  \"ActivityName\": \"@{activity('C2P').output.pipelineName}\",\n  \"errorMessage\": \"@{if(equals(activity('C2P').Status,'Failed'), activity('C2P').Error.message, '')}\"\n}\n",
 								"type": "Expression"
 							}
 						}
