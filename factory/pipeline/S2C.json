@@ -297,7 +297,7 @@
 										"type": "Expression"
 									},
 									"start_time": {
-										"value": "@activity('start_time').output.runOutput.st_res",
+										"value": "@activity('start_time').output.runOutput.start_time",
 										"type": "Expression"
 									}
 								}
