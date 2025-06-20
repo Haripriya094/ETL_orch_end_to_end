@@ -344,6 +344,56 @@
 								"referenceName": "notebook_linked_service",
 								"type": "LinkedServiceReference"
 							}
+						},
+						{
+							"name": "end_time_on_fail",
+							"type": "DatabricksNotebook",
+							"dependsOn": [
+								{
+									"activity": "archieve_on_fail",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
+								"baseParameters": {
+									"pipeline_name": {
+										"value": "@pipeline().Pipeline",
+										"type": "Expression"
+									},
+									"process_mode": "end_time",
+									"status": {
+										"value": "@{activity('source_bronze').Status}",
+										"type": "Expression"
+									},
+									"jobID": {
+										"value": "@string(item().jobID)",
+										"type": "Expression"
+									},
+									"File_Names": {
+										"value": "@item().Table_Names",
+										"type": "Expression"
+									},
+									"start_time": {
+										"value": "@activity('start_time').output.runOutput.start_time",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "notebook_linked_service",
+								"type": "LinkedServiceReference"
+							}
 						}
 					]
 				}
