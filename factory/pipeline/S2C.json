@@ -258,44 +258,6 @@
 							}
 						},
 						{
-							"name": "archieve_on_fail",
-							"type": "DatabricksNotebook",
-							"dependsOn": [
-								{
-									"activity": "bronze_sliver",
-									"dependencyConditions": [
-										"Failed"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
-								"baseParameters": {
-									"File_Names": {
-										"value": "@item().File_Names",
-										"type": "Expression"
-									},
-									"landing_path": {
-										"value": "@item().landing_Path",
-										"type": "Expression"
-									},
-									"mode": "ARC_path"
-								}
-							},
-							"linkedServiceName": {
-								"referenceName": "notebook_linked_service",
-								"type": "LinkedServiceReference"
-							}
-						},
-						{
 							"name": "end_time",
 							"type": "DatabricksNotebook",
 							"dependsOn": [
@@ -346,13 +308,13 @@
 							}
 						},
 						{
-							"name": "end_time_on_archieve_fail",
+							"name": "archieve_on_fail",
 							"type": "DatabricksNotebook",
 							"dependsOn": [
 								{
-									"activity": "archieve_on_fail",
+									"activity": "source_bronze",
 									"dependencyConditions": [
-										"Completed"
+										"Failed"
 									]
 								}
 							],
@@ -367,24 +329,15 @@
 							"typeProperties": {
 								"notebookPath": "/Users/21691a3230@mits.ac.in/azure-source-landing-curated-process-load-data",
 								"baseParameters": {
-									"pipeline_name": {
-										"value": "@pipeline().Pipeline",
-										"type": "Expression"
-									},
-									"process_mode": "end_time",
-									"status": {
-										"value": "@{activity('archieve_on_fail').Status}",
-										"type": "Expression"
-									},
-									"jobID": {
-										"value": "@string(item().jobID)",
-										"type": "Expression"
-									},
 									"File_Names": {
-										"value": "@item().Table_Names",
+										"value": "@item().File_Names",
 										"type": "Expression"
 									},
-									"start_time": "@activity('start_time').output.runOutput.st_res"
+									"landing_path": {
+										"value": "@item().landing_Path",
+										"type": "Expression"
+									},
+									"mode": "ARC_path"
 								}
 							},
 							"linkedServiceName": {
